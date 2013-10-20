@@ -1,0 +1,29 @@
+--term4:
+Twofold "x" (Twofold "y" (Or (Or (Let "x" (Const False) (Var"x")) (Var "y")) (Var"z")))
+
+--output:
+Testing x as True..
+Testing y as True..
+Warning: overwriting var x .
+Done with y.
+Done with x.
+---- Answer: True
+Testing x as True..
+Testing y as False..
+Warning: overwriting var x .
+Something went wrong..
+ No such variable as z at this point.
+{State: [("x",Const True),("y",Const False)]}
+Testing x as False..
+Testing y as True..
+Warning: overwriting var x .
+Done with y.
+Done with x.
+---- Answer: True
+Testing x as False..
+Testing y as False..
+Warning: overwriting var x .
+Something went wrong..
+ No such variable as z at this point.
+{State: [("x",Const False),("y",Const False)]}
+
