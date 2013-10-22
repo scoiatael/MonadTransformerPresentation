@@ -10,14 +10,14 @@
 \definecolor{comments}{RGB}{210,40,40}
 \usepackage{listings,times}
 \lstset{language=Haskell,
-breaklines=true,
 basicstyle=\ttfamily\small,
+breaklines=true,
 showstringspaces=false,
 keywordstyle=\color{keywords},
 commentstyle=\color{comments}\emph}
 
 \usepackage{bbm}
-\usepackage[colorlinks=true]{hyperref}
+\usepackage[colorlinks=true, urlcolor=blue]{hyperref}
 \usepackage{url}
 
 
@@ -28,7 +28,7 @@ commentstyle=\color{comments}\emph}
 \begin{document}
 \maketitle
 \section{Do kiedy, komu?}
-Zadanie należy wysłać do 21.11.2013 r. na eternal.kadir@gmail.com. Tam też należy kierować wszelkie pytania, prośby, podania i inne, związane z tematyką wykładu lub nie, sugestie. Oceniający zastrzega sobie prawo do zignorowania wszelkich otrzymanych dokumentów, za wyjątkiem zadań do oceny. 
+Zadanie należy wysłać do 21.11.2013 r. na \href{mailto:eternal.kadir@gmail.com}{\nolinkurl{eternal.kadir@gmail.com} }. Tam też należy kierować wszelkie pytania, prośby, podania i inne, związane z tematyką wykładu lub nie, sugestie. Oceniający zastrzega sobie prawo do zignorowania wszelkich otrzymanych dokumentów, za wyjątkiem zadań do oceny. 
 \section{Co?}
 \subsection{Wstęp teoretyczny}
 Niech język termów będzie opisany jako \begin{lstlisting} % (fold)
@@ -38,18 +38,19 @@ data Term = And Term Term | Or Term Term
   | Let Variable Term Term | Const Value
   | Appl Function Term deriving
 
-\end{lstlisting}. Wówczas możemy interpretować dany term poleceniem \begin{lstlisting} % (fold)
+\end{lstlisting}Wówczas możemy interpretować dany term poleceniem \begin{lstlisting} % (fold)
 
 interp :: InterpMonad m => Term -> m Value
 
-\end{lstlisting}, gdzie InterpMonad jest na przykład następującą klasą: \begin{lstlisting} % (fold)
+\end{lstlisting} gdzie InterpMonad jest na przykład następującą klasą: \begin{lstlisting} % (fold)
 
-class (MonadState m, MonadEnv m) => InterpMonad m where
-  start :: (Show a, InterpMonad m) => m a -> String
+class (MonadState m, MonadEnv m) => 
+  InterpMonad m where
+    start :: (Show a, InterpMonad m) => m a -> String
 
-\end{lstlisting}, której instancja może być pewnym złożeniem transformatorów monad. Wówczas każdy transformator będzie spełniał swoje zadanie, a jedynym problemem jest odpowiednie "liftowanie" operacji. Zostało to omówione na wykładzie,\begin{itemize}
-  \item kod: https://github.com/scoiatael/MonadTransformerExample,
-  \item prezentacja: https://github.com/scoiatael/MonadTransformerPresentation.
+  \end{lstlisting} której instancja może być pewnym złożeniem transformatorów monad. Wówczas każdy transformator będzie spełniał swoje zadanie, a jedynym problemem jest odpowiednie "liftowanie" operacji. Zostało to omówione na wykładzie,\begin{itemize}\itemsep2pt
+  \item kod: \url{https://github.com/scoiatael/MonadTransformerExample},
+  \item prezentacja: \url{https://github.com/scoiatael/MonadTransformerPresentation}.
 \end{itemize}
 \subsection{Do rzeczy}
 Niech dany będzie język, w którym termy są opisane w następujący sposób:\begin{lstlisting} % (fold)
@@ -61,16 +62,16 @@ data Term = And Term Term | Or Term Term
   \end{lstlisting}
   Natomiast interp będzie zwracał monadę będącą instancją klasy
   \begin{lstlisting}
-class (MonadState m, MonadWriter m, MonadList m, MonadError m) => InterpMonad m where
-  start :: (Show a, InterpMonad m) => m a -> String
+class (MonadState m, MonadWriter m, MonadList m, MonadError m) => 
+  InterpMonad m where
+    start :: (Show a, InterpMonad m) => m a -> String
 
 class Monad m => MonadWriter m where
   tell :: String -> m ()
 
-\end{lstlisting}Zadaniem jest napisać jego interpreter. Oczywiście, w stylu tego z wykładu. Semantyka wyrażen jest ma być podobna do tych z przykładu, z następującymi wyjątkami:\begin{itemize}
-  \item and, or są leniwe (powinno to być widoczne, gdy jedna z gałęzi wywołuje wyjątek)
-  \item instrukcje let, twofold powinny zostawiać ślad w logu (zrealizowanym przez tell MonadWriter), aby możliwe było prześledzenie historii obliczeń.
-  \item twofold powinno być interpretowane w następujący sposób:\begin{lstlisting} % (fold)
+\end{lstlisting}Zadaniem jest napisać interpreter tego języka. Interpreter ten powinien spełniać następujące kryteria:\begin{itemize}\itemsep2pt
+  \item instrukcje let, twofold powinny zostawiać ślad w logu (zrealizowanym przez tell MonadWriter), aby możliwe było prześledzenie historii obliczeń,
+  \item twofold powinno być interpretowane w dany sposób:\begin{lstlisting} % (fold)
 
   interp Twofold v t -> do
     mv <- getVar v
@@ -82,19 +83,25 @@ class Monad m => MonadWriter m where
     merge v1 v2
 
   \end{lstlisting}
-\end{itemize}.
-Można napisać program od zera lub użyć znajdujących się pod adresem https://github.com/scoiatael/MonadTransformerExample (w katalogu Task) plików przykładowych (znajduje się tam gotowa definicja funkcji interp, mogą pojawiać się tam dodatkowe wskazówki).
+  branch v X t oblicza wartość t przy zmiennej x równej X;
+  innymi słowy: twofold powinno pozwalać na sprawdzenie wyników pewnego wyrażenia dla wszystkich możliwych wartości zmiennej.
+  \item and, or powinny być leniwe (można to sprawdzić używając twofold, w którym jedna z gałęzi obliczeń wywołuje wyjątek),
+  \item semantyka pozostałych wyrażen powinna być taka, jak w przykładzie z wykładu.
+\end{itemize}
+Można napisać program od zera lub użyć znajdujących się pod adresem:\\ \url{https://github.com/scoiatael/MonadTransformerExample} (w katalogu Task) plików przykładowych (znajduje się tam gotowa definicja funkcji interp, mogą pojawiać się tam dodatkowe wskazówki).\\
+Dodatkową pomocą może być lektura \cite{mtransformer}.
 \subsection{Ocena}
-Ocenie podlega:\begin{itemize}
+Ocenie podlega:\begin{itemize}\itemsep2pt
   \item poprawność interpretera,
   \item możliwość jego rozszerzenia,
   \item styl, w jakim został napisany kod.
 \end{itemize}
-Dodatkowe punkty można zyskać za \begin{itemize}
+\vspace{3pt}
+Dodatkowe punkty można zyskać za \begin{itemize}\itemsep2pt
   \item dobrą argumentację wybranego złożenia transformatorów (jaki ma wpływ na zachowanie interpretera),
   \item przysłaniem oprócz gotowego interpretera, także jego wersji rozszerzonej o obsługę funkcji (podobnie jak w przykładzie),
   \item dobre przedstawienie możliwości swojego interpretera (przykładowe programy, problemy jakie można nim rozwiązać).
 \end{itemize}
-\section{Literatura}
-Monad transformers and modular interpreters. Sheng Liang, Paul Hudak, and Mark P. Jones. 22nd ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages, San Francisco, CA, January 1995.
+\bibliographystyle{plain}
+\bibliography{books}
 \end{document}

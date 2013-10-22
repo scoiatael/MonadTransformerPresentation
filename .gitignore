@@ -5,4 +5,6 @@
 *.log
 *.vrb
 *.out
+*.blg
+*.bbl
 .*
